@@ -13,17 +13,23 @@ resource "aws_instance" "catalogue" {
     "Name" = "${var.COMPONENT}-Server"
   }
 
-# connection {
-#   host = aws_instance.catalogue.public_ip
-#   type = "ssh"
-#   user = "${var.USER}"
-#   private_key = file("${local.key_path}")
-#   #password = "${var.PASSWORD}"
-# }
+connection {
+  host = aws_instance.catalogue.public_ip
+  type = ssh
+  user = var.USER
+  #private_key = file("${local.key_path}")
+  password = var.PASSWORD
+}
 
-# provisioner "remote-exec" {
-#   inline = [ "echo connected successfully" ]
-# }
+provisioner "remote-exec" {
+  inline = [ 
+    "set-hostname ${var.COMPONENT}",
+    "yum install nodejs -y",
+    "yum install make -y",
+    "yum install gcc-c++ -y",
+    "yum install npm -y",
+     ]
+}
 
 provisioner "local-exec" {
   command = "echo ${aws_instance.catalogue.public_ip} > catalogue_inv"
